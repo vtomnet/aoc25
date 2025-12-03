@@ -5,6 +5,7 @@ create linebuf max-line chars allot
 create digitbuf max-line cells allot
 variable ndigits
 
+: 3drop ( a b c -- ) 2drop drop ;
 : is-digit? ( c -- flag ) dup [char] 0 >= swap [char] 9 <= and ;
 : >digit ( c -- n ) [char] 0 - ;
 : reset-digits ( -- ) 0 ndigits ! ;
@@ -31,11 +32,9 @@ variable ndigits
     LOOP ;
 
 : process-bank ( -- n )
-    0 ndigits @ 1- max-index
-    dup 1+ ndigits @ max-index
-    nth-digit
-    swap nth-digit 10 * +
-    ;
+    ndigits @ 0 over 1- max-index
+    dup 1+ rot max-index nth-digit
+    swap nth-digit 10 * + ;
 
 : process-line ( c-addr u -- n )
     reset-digits
@@ -51,7 +50,7 @@ variable ndigits
     WHILE
         process-line +
     REPEAT
-    2drop r> drop ;
+    r> 3drop ;
 
 : main ( -- )
     FILENAME$ r/o open-file throw
